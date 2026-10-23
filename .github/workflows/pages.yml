@@ -20,6 +20,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate editor module syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          if 'type="importmap"' not in html:
+              raise SystemExit("Missing import map")
+          match = re.search(r'<script type="module">(.*?)</script>', html, re.S)
+          if not match:
+              raise SystemExit("Missing JavaScript module")
+          Path("/tmp/map-maker.mjs").write_text(match.group(1), encoding="utf-8")
+          required = ["promptBuildBtn", "scatterBtn", "shotBtn", "toggleGridBtn"]
+          for marker in required:
+              if marker not in html:
+                  raise SystemExit(f"Missing feature marker: {marker}")
+          print("HTML feature smoke checks passed.")
+          PY
+          node --check /tmp/map-maker.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site artifact
