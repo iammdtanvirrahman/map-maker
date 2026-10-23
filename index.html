@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0f14" />
+<meta name="description" content="Map Maker — create, sculpt, and share interactive 3D worlds." />
+<title>Map Maker — Build a World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#090c11;--panel:#10151d;--panel2:#151c26;--line:#27313e;--muted:#8793a5;--text:#eef3fa;--lime:#c6f36b;--blue:#73d6ff;--danger:#ff8c86}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:"Space Grotesk",sans-serif}button,input,select{font:inherit}button{cursor:pointer;color:inherit;border:1px solid var(--line);background:#161e28;border-radius:9px;padding:9px 12px;transition:.18s ease}button:hover{border-color:#526176;background:#202b38}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}button.primary{background:var(--lime);color:#10150a;border-color:var(--lime);font-weight:700}button.active{border-color:var(--lime);background:#29351f;color:var(--lime)}button:disabled{opacity:.38;cursor:not-allowed}.app{height:100dvh;display:grid;grid-template-rows:62px 1fr}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;border-bottom:1px solid var(--line);background:#0d1117;z-index:4}.brand{display:flex;align-items:center;gap:11px;min-width:190px}.brand-icon{width:32px;height:32px;border-radius:10px;background:var(--lime);color:#11190a;display:grid;place-items:center;font-size:19px;font-weight:700}.brand-name{font-size:15px;font-weight:700;letter-spacing:-.4px}.brand-sub{font:10px "DM Mono",monospace;letter-spacing:1.5px;color:var(--muted);margin-top:2px}.project-name{display:flex;align-items:center;gap:8px;color:#c6cfdb;font-size:13px}.project-name input{width:160px;background:transparent;border:0;color:inherit;border-bottom:1px solid transparent;outline:none;padding:5px}.project-name input:focus{border-color:var(--lime)}.top-actions{display:flex;align-items:center;gap:8px}.status{font:10px "DM Mono",monospace;color:var(--muted);display:flex;gap:6px;align-items:center;margin-right:4px}.dot{width:7px;height:7px;background:var(--lime);border-radius:100%;box-shadow:0 0 10px #c6f36655}.workspace{display:grid;grid-template-columns:238px minmax(0,1fr) 260px;min-height:0}.sidebar{background:var(--panel);min-height:0;overflow-y:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}.side-head{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#b8c2d0;font-weight:700}.section{padding:14px;border-bottom:1px solid var(--line)}.section-title{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#aeb9c7;text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;font-weight:700}.hint{color:var(--muted);font-size:11px;line-height:1.5}.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:10px;min-height:70px;text-align:left;font-size:12px;background:#141b24}.tool .ico{font-size:19px}.tool small{font-size:10px;color:var(--muted)}.terrain-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.swatch{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:11px;background:#131a22}.swatch.active{border-color:var(--lime);background:#222c1b}.swatch i{width:22px;height:22px;border-radius:6px;display:block;border:1px solid #ffffff1f}.center{position:relative;min-width:0;min-height:0;background:#18232d;overflow:hidden}.viewport{position:absolute;inset:0}.viewport canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}.view-top{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;gap:10px;pointer-events:none}.view-top>*{pointer-events:auto}.chip{background:#0b1119d9;border:1px solid #435064a8;backdrop-filter:blur(12px);border-radius:9px;padding:9px 11px;font-size:11px;color:#d8e2ee;display:flex;align-items:center;gap:8px}.chip strong{font-weight:600}.view-bottom{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:end;gap:12px;pointer-events:none}.view-bottom>*{pointer-events:auto}.mini-stats{display:flex;gap:7px}.stat{background:#0b1119db;border:1px solid #4350649c;padding:8px 10px;border-radius:8px;font:10px "DM Mono",monospace;color:#aab7c7}.stat b{font-size:12px;color:#f2f6fa;display:block;margin-top:3px}.range-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:#bec8d5;margin:13px 0 5px}.range-row output{font:10px "DM Mono",monospace;color:var(--lime)}input[type=range]{width:100%;accent-color:var(--lime)}input[type=text],select{width:100%;background:#0d1219;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px}.field-label{display:block;color:#aeb9c7;font-size:11px;margin:12px 0 6px}.full{width:100%}.object-list{display:flex;flex-direction:column;gap:5px}.object-row{display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid transparent;border-radius:8px;font-size:12px;color:#c4ceda;cursor:pointer}.object-row:hover{background:#17202a}.object-row.selected{background:#26321e;border-color:#718b44;color:var(--lime)}.object-row .obj-icon{font-size:16px;width:22px}.object-row .obj-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.object-row .obj-pos{font:9px "DM Mono",monospace;color:var(--muted)}.empty{padding:12px;border:1px dashed #354252;border-radius:8px;color:var(--muted);font-size:11px;text-align:center;line-height:1.5}.notice{position:absolute;left:50%;bottom:76px;transform:translate(-50%,8px);opacity:0;pointer-events:none;background:#121923;border:1px solid #354353;border-radius:10px;padding:10px 14px;font-size:12px;transition:.22s;z-index:5;white-space:nowrap;box-shadow:0 12px 34px #0005}.notice.show{opacity:1;transform:translate(-50%,0)}.modal-backdrop{position:fixed;inset:0;background:#02050ad9;display:none;place-items:center;z-index:10;padding:18px}.modal-backdrop.show{display:grid}.modal{width:min(640px,100%);max-height:88dvh;overflow:auto;background:#101720;border:1px solid #354253;border-radius:16px;padding:20px;box-shadow:0 28px 90px #0008}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.modal h2{font-size:18px;margin:0}.modal textarea{width:100%;min-height:260px;background:#080d13;color:#dce6f2;border:1px solid var(--line);border-radius:10px;padding:12px;font:11px "DM Mono",monospace;resize:vertical}.modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:12px}.mobile-tabs{display:none}.small-note{font-size:10px;color:var(--muted);line-height:1.5;margin-top:10px}
+@media(max-width:1050px){.workspace{grid-template-columns:210px minmax(0,1fr) 225px}.brand{min-width:auto}.brand-sub{display:none}.project-name input{width:115px}.status{display:none}}
+@media(max-width:760px){.app{grid-template-rows:54px 1fr}.topbar{padding:0 10px}.brand{gap:7px}.brand-icon{width:29px;height:29px}.brand-name{font-size:13px}.project-name{display:none}.top-actions{gap:5px}.top-actions button{padding:8px;font-size:11px}.workspace{display:block;position:relative}.center{position:absolute;inset:0 0 54px}.sidebar{display:none}.sidebar.mobile-open{display:block;position:absolute;z-index:3;top:0;bottom:54px;width:min(310px,88vw);overflow:auto;box-shadow:0 12px 40px #0008}.left.mobile-open{left:0}.right.mobile-open{right:0}.mobile-tabs{position:absolute;bottom:0;height:54px;left:0;right:0;border-top:1px solid var(--line);background:#0d1117;display:grid;grid-template-columns:repeat(3,1fr);z-index:4}.mobile-tabs button{border:0;border-radius:0;background:transparent;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-size:10px;color:var(--muted)}.mobile-tabs button span{font-size:17px}.mobile-tabs button.active{color:var(--lime);background:#1b2417}.view-top{top:9px;left:9px;right:9px}.view-bottom{bottom:9px;left:9px;right:9px}.chip{padding:7px 9px;font-size:10px}.mini-stats .stat:nth-child(2){display:none}.stat{padding:7px 8px}.notice{bottom:65px;max-width:90vw;overflow:hidden;text-overflow:ellipsis}.brand-sub{display:none}}
+@media(max-width:390px){.top-actions button{padding:7px 8px}.brand-name{max-width:72px;overflow:hidden}.view-top .chip:last-child{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-icon">M</div><div><div class="brand-name">MAP MAKER</div><div class="brand-sub">WORLD STUDIO / 001</div></div></div>
+    <label class="project-name" title="Rename your world">◈ <input id="worldName" value="Untitled World" aria-label="World name" maxlength="64"></label>
+    <div class="top-actions">
+      <div class="status"><span class="dot"></span><span id="saveStatus">LOCAL PROJECT</span></div>
+      <button id="undoBtn" title="Undo (Ctrl+Z)" disabled>↶</button>
+      <button id="redoBtn" title="Redo (Ctrl+Y)" disabled>↷</button>
+      <button id="newBtn">New</button>
+      <button id="exportBtn" class="primary">Export ↗</button>
+    </div>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar left" id="leftPanel">
+      <div class="side-head"><span>Creation tools</span><span>01</span></div>
+      <section class="section">
+        <div class="section-title">Build your world <span>✦</span></div>
+        <div class="tool-grid">
+          <button class="tool active" data-tool="raise"><span class="ico">⛰</span><span>Raise terrain</span><small>SCULPT</small></button>
+          <button class="tool" data-tool="lower"><span class="ico">⌄</span><span>Lower terrain</span><small>SCULPT</small></button>
+          <button class="tool" data-tool="flatten"><span class="ico">▱</span><span>Flatten</span><small>SCULPT</small></button>
+          <button class="tool" data-tool="paint"><span class="ico">◉</span><span>Paint surface</span><small>MATERIAL</small></button>
+        </div>
+        <div class="range-row"><label for="brushSize">Brush size</label><output id="brushSizeOut">3.0</output></div>
+        <input type="range" id="brushSize" min="1" max="8" step=".5" value="3">
+        <div class="range-row"><label for="brushStrength">Brush strength</label><output id="brushStrengthOut">0.65</output></div>
+        <input type="range" id="brushStrength" min=".1" max="1.5" step=".05" value=".65">
+        <p class="hint">Click or drag on the terrain to sculpt. Switch to Select to interact with placed objects.</p>
+      </section>
+      <section class="section">
+        <div class="section-title">Surface materials</div>
+        <div class="terrain-grid">
+          <button class="swatch active" data-material="grass"><i style="background:#77965b"></i>Grass</button>
+          <button class="swatch" data-material="sand"><i style="background:#c8b478"></i>Sand</button>
+          <button class="swatch" data-material="rock"><i style="background:#858b91"></i>Rock</button>
+          <button class="swatch" data-material="snow"><i style="background:#e0e7e9"></i>Snow</button>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-title">Place objects <span>04</span></div>
+        <div class="tool-grid">
+          <button class="tool" data-place="tree"><span class="ico">🌲</span><span>Tree</span><small>VEGETATION</small></button>
+          <button class="tool" data-place="rock"><span class="ico">🪨</span><span>Rock</span><small>NATURE</small></button>
+          <button class="tool" data-place="house"><span class="ico">⌂</span><span>House</span><small>BUILDING</small></button>
+          <button class="tool" data-place="tower"><span class="ico">♜</span><span>Tower</span><small>BUILDING</small></button>
+          <button class="tool" data-place="water"><span class="ico">≈</span><span>Water pond</span><small>LANDSCAPE</small></button>
+          <button class="tool" data-place="path"><span class="ico">╱</span><span>Path marker</span><small>LANDSCAPE</small></button>
+        </div>
+        <p class="hint">Choose an object, then click the terrain to place it. Select an object to move, rotate or delete it.</p>
+      </section>
+      <section class="section">
+        <div class="section-title">World presets</div>
+        <select id="presetSelect" aria-label="World preset">
+          <option value="island">Floating island</option>
+          <option value="valley">Green valley</option>
+          <option value="desert">Desert plateau</option>
+          <option value="mountains">Snowy mountains</option>
+        </select>
+        <button class="full" id="generateBtn" style="margin-top:8px">✦ Generate terrain</button>
+      </section>
+    </aside>
+    <section class="center">
+      <div class="viewport" id="viewport"></div>
+      <div class="view-top">
+        <div class="chip"><span class="dot"></span><strong id="toolLabel">RAISE TERRAIN</strong><span style="color:var(--muted)">· EDIT MODE</span></div>
+        <div class="chip">⌖ <strong id="coordLabel">X 0.0 / Z 0.0</strong></div>
+      </div>
+      <div class="view-bottom">
+        <div class="mini-stats"><div class="stat">OBJECTS<b id="objectCount">0</b></div><div class="stat">WORLD SIZE<b>128 × 128 m</b></div><div class="stat">MODE<b>3D / REALTIME</b></div></div>
+        <div class="chip">Drag to orbit · Scroll to zoom</div>
+      </div>
+      <div class="notice" id="notice" role="status" aria-live="polite"></div>
+    </section>
+    <aside class="sidebar right" id="rightPanel">
+      <div class="side-head"><span>World inspector</span><span>02</span></div>
+      <section class="section">
+        <div class="section-title">Scene hierarchy <button id="clearObjectsBtn" style="padding:3px 7px;font-size:10px">Clear</button></div>
+        <div class="object-list" id="objectList"><div class="empty">Your world is waiting.<br>Place an object to get started.</div></div>
+      </section>
+      <section class="section">
+        <div class="section-title">Selected object</div>
+        <div id="noSelection" class="empty">Select an object in the scene or hierarchy to edit its properties.</div>
+        <div id="selectionControls" hidden>
+          <label class="field-label" for="objectName">Name</label><input id="objectName" type="text" maxlength="64">
+          <div class="range-row"><label for="posX">Position X</label><output id="posXOut">0.0</output></div><input id="posX" type="range" min="-60" max="60" step=".5">
+          <div class="range-row"><label for="posZ">Position Z</label><output id="posZOut">0.0</output></div><input id="posZ" type="range" min="-60" max="60" step=".5">
+          <div class="range-row"><label for="objScale">Scale</label><output id="objScaleOut">1.0×</output></div><input id="objScale" type="range" min=".3" max="3" step=".1" value="1">
+          <div class="range-row"><label for="objRotate">Rotation</label><output id="objRotateOut">0°</output></div><input id="objRotate" type="range" min="0" max="359" step="1" value="0">
+          <div style="display:flex;gap:7px;margin-top:14px"><button id="duplicateBtn" class="full">▣ Duplicate</button><button id="deleteBtn" class="full" style="color:var(--danger)">Delete</button></div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-title">World settings</div>
+        <label class="field-label" for="worldTime">Lighting</label>
+        <select id="worldTime"><option value="day">Clear daylight</option><option value="sunset">Warm sunset</option><option value="night">Blue hour</option></select>
+        <label class="field-label" for="terrainDetail">Terrain detail</label>
+        <select id="terrainDetail"><option value="48">Performance · 48 segments</option><option value="80" selected>Balanced · 80 segments</option><option value="120">High · 120 segments</option></select>
+        <button class="full" id="resetCameraBtn" style="margin-top:9px">↗ Reset camera</button>
+        <button class="full" id="saveLocalBtn" style="margin-top:7px">Save in this browser</button>
+        <p class="small-note">Prototype note: projects are saved in this browser or exported as a JSON file. Cloud accounts and public publishing are planned for a later release.</p>
+      </section>
+    </aside>
+    <nav class="mobile-tabs" aria-label="Editor panels">
+      <button data-panel="leftPanel"><span>⚒</span>Tools</button>
+      <button data-panel="scene"><span>◈</span>World</button>
+      <button data-panel="rightPanel"><span>☷</span>Inspector</button>
+    </nav>
+  </main>
+</div>
+<div class="modal-backdrop" id="exportModal">
+  <div class="modal">
+    <div class="modal-head"><h2>Export your world</h2><button id="closeModal">✕</button></div>
+    <p class="hint">Your project is represented as editable world data. Download it as JSON to keep a backup or continue development.</p>
+    <textarea id="exportText" spellcheck="false" aria-label="World JSON export"></textarea>
+    <div class="modal-actions"><label class="hint" style="align-self:center">MAP MAKER · WORLD FILE v1</label><div style="display:flex;gap:7px"><button id="importBtn">Import JSON</button><button class="primary" id="downloadBtn">Download .json</button></div></div>
+    <p class="small-note">Import replaces the current scene. Keep a backup before loading an unfamiliar project file.</p>
+  </div>
+</div>
+<input id="fileInput" type="file" accept=".json,application/json" hidden>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js';
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const viewport = $('#viewport');
+let scene, camera, renderer, controls, terrain, terrainMaterial, raycaster, pointer;
+let heightData, groundColors, terrainSegments = 80, terrainSize = 128;
+let activeTool = 'raise', activeMaterial = 'grass', placeType = null;
+let selected = null, objectRecords = [], nextId = 1;
+let undoStack = [], redoStack = [], strokeBefore = null, isSculpting = false;
+let toastTimer = null, saveTimer = null, lastPointer = new THREE.Vector2(), pointerDown = false;
+const matColors = { grass: new THREE.Color('#77965b'), sand: new THREE.Color('#c8b478'), rock: new THREE.Color('#858b91'), snow: new THREE.Color('#e0e7e9') };
+const typeLabels = {tree:'Tree',rock:'Rock',house:'House',tower:'Tower',water:'Water pond',path:'Path marker'};
+const typeIcons = {tree:'🌲',rock:'🪨',house:'⌂',tower:'♜',water:'≈',path:'╱'};
+const toolLabels = {raise:'RAISE TERRAIN',lower:'LOWER TERRAIN',flatten:'FLATTEN TERRAIN',paint:'PAINT SURFACE',select:'SELECT OBJECT'};
+function notify(message){const n=$('#notice');n.textContent=message;n.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>n.classList.remove('show'),2300)}
+function updateStatus(s='UNSAVED CHANGES'){$('#saveStatus').textContent=s}
+function randomNoise(x,z){return (Math.sin(x*1.7+z*.37)*Math.cos(z*1.21-x*.49)+Math.sin(x*.41-z*.82)*.5+Math.cos((x+z)*.67)*.25)}
+function baseHeight(x,z,preset='island'){
+  const n=randomNoise(x*.16,z*.16)*1.8+randomNoise(x*.42,z*.42)*.75;
+  const r=Math.sqrt(x*x+z*z), island=Math.max(0,1-r/64);
+  if(preset==='desert')return Math.max(-1,Math.sin(x*.14)*1.3+Math.cos(z*.12)*1.5+n*.35);
+  if(preset==='mountains')return Math.max(-.4,Math.abs(Math.sin(x*.075)*Math.cos(z*.065))*13+Math.max(0,n)*2.5-2);
+  if(preset==='valley')return 1.8*Math.sin(x*.08)+1.8*Math.cos(z*.08)+n*.65;
+  return Math.max(-1.5,island*10+n*island);
+}
+function buildTerrain(preset='island',segments=terrainSegments,keep=false){
+  terrainSegments=segments;
+  const old=terrain;
+  const geo=new THREE.PlaneGeometry(terrainSize,terrainSize,segments,segments);geo.rotateX(-Math.PI/2);
+  const pos=geo.attributes.position; heightData=new Float32Array(pos.count);groundColors=new Float32Array(pos.count*3);
+  for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);const h=baseHeight(x,z,preset);pos.setY(i,h);heightData[i]=h;const c=matColors.grass.clone();if(h>7)c.lerp(matColors.rock,Math.min(1,(h-7)/8));if(preset==='desert')c.copy(matColors.sand);if(preset==='mountains'&&h>7)c.lerp(matColors.snow,Math.min(1,(h-7)/9));groundColors.set([c.r,c.g,c.b],i*3)}
+  geo.setAttribute('color',new THREE.BufferAttribute(groundColors,3));geo.computeVertexNormals();
+  terrainMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.94,metalness:0});
+  terrain=new THREE.Mesh(geo,terrainMaterial);terrain.name='Terrain';terrain.receiveShadow=true;terrain.castShadow=false;terrain.userData.isTerrain=true;scene.add(terrain);
+  if(old)scene.remove(old);
+  $('#terrainDetail').value=String(segments);
+  if(!keep){objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];selected=null;renderObjectList();updateInspector()}
+  updateStatus();return terrain;
+}
+function heightAt(x,z){
+ const geo=terrain.geometry,pos=geo.attributes.position;
+ let best=0,dist=Infinity;
+ for(let i=0;i<pos.count;i++){const dx=pos.getX(i)-x,dz=pos.getZ(i)-z,d=dx*dx+dz*dz;if(d<dist){dist=d;best=i}}
+ return heightData[best]||0;
+}
+function makeTree(){
+ const g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,1.5,7),new THREE.MeshStandardMaterial({color:'#76503a',roughness:1}));trunk.position.y=.75;trunk.castShadow=true;g.add(trunk);
+ [[1.25,.92,.9,'#466d43'],[1.85,.72,.72,'#4f8048'],[2.35,.49,.52,'#608e4f']].forEach(([y,r,_,color])=>{const m=new THREE.Mesh(new THREE.ConeGeometry(r,1.25,8),new THREE.MeshStandardMaterial({color,roughness:1}));m.position.y=y;m.castShadow=true;g.add(m)});
+ return g;
+}
+function makeRock(){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(.85,1),new THREE.MeshStandardMaterial({color:'#858c8e',roughness:1}));m.scale.set(1.25,.72,.95);m.castShadow=true;return m}
+function makeHouse(){
+ const g=new THREE.Group(),wall=new THREE.Mesh(new THREE.BoxGeometry(2.6,1.7,2.1),new THREE.MeshStandardMaterial({color:'#e0cba7',roughness:.9}));wall.position.y=.85;wall.castShadow=true;wall.receiveShadow=true;g.add(wall);
+ const roof=new THREE.Mesh(new THREE.ConeGeometry(1.95,.95,4),new THREE.MeshStandardMaterial({color:'#9c5c47',roughness:.86}));roof.position.y=2.08;roof.rotation.y=Math.PI/4;roof.scale.z=.85;roof.castShadow=true;g.add(roof);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(.48,.92,.07),new THREE.MeshStandardMaterial({color:'#583c2b'}));door.position.set(0,.46,1.06);g.add(door);return g;
+}
+function makeTower(){
+ const g=new THREE.Group(),base=new THREE.Mesh(new THREE.CylinderGeometry(.85,.95,3.6,8),new THREE.MeshStandardMaterial({color:'#9a9da0',roughness:1}));base.position.y=1.8;base.castShadow=true;g.add(base);
+ const cap=new THREE.Mesh(new THREE.ConeGeometry(1.1,1.2,8),new THREE.MeshStandardMaterial({color:'#6c8199',roughness:.9}));cap.position.y=4.2;cap.castShadow=true;g.add(cap);return g;
+}
+function makeWater(){const m=new THREE.Mesh(new THREE.CylinderGeometry(3.2,3.2,.13,40),new THREE.MeshStandardMaterial({color:'#3b9ed0',roughness:.22,metalness:.08,transparent:true,opacity:.88}));m.position.y=.12;return m}
+function makePath(){const m=new THREE.Mesh(new THREE.BoxGeometry(3,.08,.6),new THREE.MeshStandardMaterial({color:'#d4c39a',roughness:1}));m.position.y=.08;return m}
+function makeObject(type){
+ const builders={tree:makeTree,rock:makeRock,house:makeHouse,tower:makeTower,water:makeWater,path:makePath};return (builders[type]||makeRock)();
+}
+function snapshot(){
+ return {name:$('#worldName').value,terrainSegments,heights:Array.from(heightData),colors:Array.from(groundColors),objects:objectRecords.map(o=>({id:o.id,type:o.type,name:o.name,position:o.mesh.position.toArray(),rotation:o.mesh.rotation.toArray(),scale:o.mesh.scale.toArray()})),camera:{position:camera.position.toArray(),target:controls.target.toArray()}};
+}
+function restoreSnapshot(data){
+ $('#worldName').value=data.name||'Untitled World';
+ terrainSegments=data.terrainSegments||80;
+ buildTerrain('island',terrainSegments,true);
+ const pos=terrain.geometry.attributes.position;
+ if(Array.isArray(data.heights)&&data.heights.length===pos.count){heightData=Float32Array.from(data.heights);for(let i=0;i<pos.count;i++)pos.setY(i,heightData[i]);}
+ if(Array.isArray(data.colors)&&data.colors.length===pos.count*3){groundColors=Float32Array.from(data.colors);terrain.geometry.setAttribute('color',new THREE.BufferAttribute(groundColors,3))}
+ terrain.geometry.attributes.position.needsUpdate=true;terrain.geometry.attributes.color.needsUpdate=true;terrain.geometry.computeVertexNormals();
+ objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];
+ for(const entry of (data.objects||[])){const mesh=makeObject(entry.type);mesh.position.fromArray(entry.position||[0,0,0]);mesh.rotation.fromArray(entry.rotation||[0,0,0]);mesh.scale.fromArray(entry.scale||[1,1,1]);scene.add(mesh);objectRecords.push({...entry,mesh});nextId=Math.max(nextId,(entry.id||0)+1)}
+ if(data.camera){camera.position.fromArray(data.camera.position);controls.target.fromArray(data.camera.target);controls.update()}
+ selected=null;renderObjectList();updateInspector();updateStats();updateStatus('PROJECT LOADED');
+}
+function checkpoint(){undoStack.push(JSON.stringify(snapshot()));if(undoStack.length>35)undoStack.shift();redoStack=[];refreshHistoryButtons()}
+function refreshHistoryButtons(){$('#undoBtn').disabled=!undoStack.length;$('#redoBtn').disabled=!redoStack.length}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(snapshot()));restoreSnapshot(JSON.parse(undoStack.pop()));refreshHistoryButtons();notify('Undo complete')}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(snapshot()));restoreSnapshot(JSON.parse(redoStack.pop()));refreshHistoryButtons();notify('Redo complete')}
+function addObject(type,x=0,z=0,record=true){
+ if(record)checkpoint();const mesh=makeObject(type);mesh.position.set(x,heightAt(x,z),z);mesh.rotation.y=Math.random()*.25;scene.add(mesh);
+ const obj={id:nextId++,type,name:(typeLabels[type]||'Object')+' '+(objectRecords.filter(o=>o.type===type).length+1),mesh};objectRecords.push(obj);selectObject(obj);renderObjectList();updateStats();updateStatus();return obj;
+}
+function selectObject(obj){
+ selected=obj;placeType=null;activeTool='select';updateToolUI();renderObjectList();updateInspector();
+}
+function deleteSelected(){if(!selected)return;checkpoint();scene.remove(selected.mesh);objectRecords=objectRecords.filter(o=>o!==selected);selected=null;renderObjectList();updateInspector();updateStats();updateStatus();notify('Object deleted')}
+function duplicateSelected(){if(!selected)return;checkpoint();const o=selected,copy=makeObject(o.type);copy.position.copy(o.mesh.position).add(new THREE.Vector3(2,0,2));copy.position.y=heightAt(copy.position.x,copy.position.z);copy.rotation.copy(o.mesh.rotation);copy.scale.copy(o.mesh.scale);scene.add(copy);const n={id:nextId++,type:o.type,name:o.name+' copy',mesh:copy};objectRecords.push(n);selectObject(n);updateStats();updateStatus();notify('Object duplicated')}
+function renderObjectList(){
+ const list=$('#objectList');list.innerHTML='';
+ if(!objectRecords.length){list.innerHTML='<div class="empty">Your world is waiting.<br>Place an object to get started.</div>';return}
+ [...objectRecords].reverse().forEach(obj=>{const row=document.createElement('div');row.className='object-row'+(obj===selected?' selected':'');row.innerHTML='<span class="obj-icon"></span><span class="obj-name"></span><span class="obj-pos"></span>';row.querySelector('.obj-icon').textContent=typeIcons[obj.type]||'◈';row.querySelector('.obj-name').textContent=obj.name;row.querySelector('.obj-pos').textContent=obj.mesh.position.x.toFixed(0)+', '+obj.mesh.position.z.toFixed(0);row.addEventListener('click',()=>{selectObject(obj);camera.lookAt(obj.mesh.position);controls.target.copy(obj.mesh.position);controls.update()});list.append(row)})
+}
+function updateInspector(){
+ $('#noSelection').hidden=!!selected;$('#selectionControls').hidden=!selected;if(!selected)return;
+ $('#objectName').value=selected.name;$('#posX').value=selected.mesh.position.x;$('#posZ').value=selected.mesh.position.z;$('#objScale').value=selected.mesh.scale.x;$('#objRotate').value=Math.round(THREE.MathUtils.radToDeg(selected.mesh.rotation.y));
+ $('#posXOut').textContent=selected.mesh.position.x.toFixed(1);$('#posZOut').textContent=selected.mesh.position.z.toFixed(1);$('#objScaleOut').textContent=selected.mesh.scale.x.toFixed(1)+'×';$('#objRotateOut').textContent=$('#objRotate').value+'°';
+}
+function updateStats(){$('#objectCount').textContent=objectRecords.length}
+function updateToolUI(){
+ $$('.tool[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===activeTool));
+ $$('.tool[data-place]').forEach(b=>b.classList.toggle('active',b.dataset.place===placeType));
+ $$('.swatch').forEach(b=>b.classList.toggle('active',b.dataset.material===activeMaterial));
+ $('#toolLabel').textContent=placeType?('PLACE '+typeLabels[placeType].toUpperCase()):(toolLabels[activeTool]||activeTool.toUpperCase());
+}
+function updateGroundColors(){
+ const colors=terrain.geometry.attributes.color;
+ for(let i=0;i<colors.count;i++){const c=matColors[activeMaterial].clone();const h=heightData[i];if(activeMaterial==='grass'&&h>8)c.lerp(matColors.rock,Math.min(.9,(h-8)/12));colors.setXYZ(i,c.r,c.g,c.b);groundColors.set([c.r,c.g,c.b],i*3)}
+ colors.needsUpdate=true;terrain.geometry.computeVertexNormals();updateStatus();
+}
+function sculptAt(point){
+ const geo=terrain.geometry,pos=geo.attributes.position;const radius=Number($('#brushSize').value),strength=Number($('#brushStrength').value)*.095;
+ if(!strokeBefore)strokeBefore=Array.from(heightData);
+ for(let i=0;i<pos.count;i++){
+   const dx=pos.getX(i)-point.x,dz=pos.getZ(i)-point.z,d=Math.hypot(dx,dz);if(d>radius)continue;
+   const falloff=(1+Math.cos(Math.PI*d/radius))/2;
+   if(activeTool==='raise')heightData[i]+=strength*falloff;
+   else if(activeTool==='lower')heightData[i]-=strength*falloff;
+   else if(activeTool==='flatten'){const target=point.y; heightData[i]+=(target-heightData[i])*.16*falloff}
+   pos.setY(i,heightData[i]);
+ }
+ pos.needsUpdate=true;geo.computeVertexNormals();updateStatus();
+}
+function commitStroke(){if(strokeBefore){undoStack.push(JSON.stringify({...snapshot(),heights:strokeBefore}));if(undoStack.length>35)undoStack.shift();redoStack=[];strokeBefore=null;refreshHistoryButtons();scheduleSave()}}
+function paintAt(point){
+ const pos=terrain.geometry.attributes.position,col=terrain.geometry.attributes.color,radius=Number($('#brushSize').value)*1.5;
+ for(let i=0;i<pos.count;i++){const d=Math.hypot(pos.getX(i)-point.x,pos.getZ(i)-point.z);if(d>radius)continue;const f=(1+Math.cos(Math.PI*d/radius))/2,base=matColors[activeMaterial];const current=new THREE.Color(col.getX(i),col.getY(i),col.getZ(i));current.lerp(base,.6*f);col.setXYZ(i,current.r,current.g,current.b);groundColors.set([current.r,current.g,current.b],i*3)}
+ col.needsUpdate=true;updateStatus();
+}
+function getHit(e){
+ const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(pointer,camera);
+ const hits=raycaster.intersectObjects([terrain,...objectRecords.map(o=>o.mesh)],true);
+ if(!hits.length)return null;
+ let hit=hits[0];let object=hit.object;while(object.parent&&object!==terrain&&!objectRecords.some(o=>o.mesh===object))object=object.parent;
+ const record=objectRecords.find(o=>o.mesh===object);return {hit,object,record,point:hit.point};
+}
+function init(){
+ scene=new THREE.Scene();scene.background=new THREE.Color('#a8c8d5');scene.fog=new THREE.Fog('#a8c8d5',115,255);
+ camera=new THREE.PerspectiveCamera(48,1,.1,600);camera.position.set(76,72,88);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;viewport.appendChild(renderer.domElement);
+ controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.06;controls.maxPolarAngle=Math.PI*.485;controls.minDistance=15;controls.maxDistance=220;controls.target.set(0,2,0);
+ scene.add(new THREE.HemisphereLight('#e2f4ff','#4b5840',2.0));
+ const sun=new THREE.DirectionalLight('#fff0d2',3.2);sun.position.set(-45,80,35);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;scene.add(sun);scene.add(sun.target);
+ const grid=new THREE.GridHelper(terrainSize,32,'#6f8c83','#71877f');grid.position.y=-1.8;grid.material.transparent=true;grid.material.opacity=.2;scene.add(grid);
+ raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();
+ buildTerrain('island');
+ const resize=()=>{const w=Math.max(1,viewport.clientWidth),h=Math.max(1,viewport.clientHeight);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)};new ResizeObserver(resize).observe(viewport);resize();
+ renderer.domElement.addEventListener('pointerdown',onPointerDown);renderer.domElement.addEventListener('pointermove',onPointerMove);renderer.domElement.addEventListener('pointerup',onPointerUp);renderer.domElement.addEventListener('pointercancel',onPointerUp);renderer.domElement.addEventListener('dblclick',()=>{controls.target.set(0,0,0);controls.update()});
+ function loop(){requestAnimationFrame(loop);controls.update();renderer.render(scene,camera)}loop();
+}
+function onPointerDown(e){
+ if(e.button!==0)return;pointerDown=true;const result=getHit(e);if(!result)return;
+ if(result.object===terrain){
+  const p=result.point;$('#coordLabel').textContent='X '+p.x.toFixed(1)+' / Z '+p.z.toFixed(1);
+  if(placeType){addObject(placeType,p.x,p.z);placeType=null;updateToolUI();scheduleSave();return}
+  if(activeTool==='select'){selected=null;renderObjectList();updateInspector();return}
+  checkpoint();isSculpting=true;controls.enabled=false;
+  if(activeTool==='paint')paintAt(p);else sculptAt(p);
+ }else if(result.record&&activeTool==='select'){selectObject(result.record)}
+ else if(result.record&&placeType){addObject(placeType,result.point.x,result.point.z)}
+}
+function onPointerMove(e){
+ const rect=renderer.domElement.getBoundingClientRect();lastPointer.set(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
+ if(!pointerDown)return;const result=getHit(e);if(!result||result.object!==terrain)return;
+ if(isSculpting){if(activeTool==='paint')paintAt(result.point);else sculptAt(result.point);$('#coordLabel').textContent='X '+result.point.x.toFixed(1)+' / Z '+result.point.z.toFixed(1)}
+}
+function onPointerUp(){pointerDown=false;if(isSculpting){commitStroke();isSculpting=false;controls.enabled=true;scheduleSave()}}
+function setLighting(mode){
+ const configs={day:{bg:'#a8c8d5',fog:'#a8c8d5',exposure:1.15},sunset:{bg:'#d99b7b',fog:'#d99b7b',exposure:1.2},night:{bg:'#17243d',fog:'#17243d',exposure:.72}};
+ const c=configs[mode]||configs.day;scene.background.set(c.bg);scene.fog.color.set(c.fog);renderer.toneMappingExposure=c.exposure;
+ scene.children.filter(o=>o.isHemisphereLight).forEach(l=>{l.intensity=mode==='night'?.65:2;l.color.set(mode==='sunset'?'#ffd5b0':mode==='night'?'#7d9bd3':'#e2f4ff')});
+ scene.children.filter(o=>o.isDirectionalLight).forEach(l=>{l.intensity=mode==='night'?.55:3.2;l.color.set(mode==='sunset'?'#ffb37b':mode==='night'?'#91b4ff':'#fff0d2')});
+}
+function saveLocal(silent=false){
+ try{localStorage.setItem('mapmaker.project.v1',JSON.stringify(snapshot()));updateStatus('SAVED LOCALLY');if(!silent)notify('Saved in this browser')}catch(e){notify('Could not save: browser storage is full')}
+}
+function scheduleSave(){clearTimeout(saveTimer);updateStatus();saveTimer=setTimeout(()=>saveLocal(true),700)}
+function exportProject(){
+ const data=snapshot();$('#exportText').value=JSON.stringify({format:'map-maker-world',version:1,...data},null,2);$('#exportModal').classList.add('show');
+}
+function importData(data){if(!data||!Array.isArray(data.objects)||!Number.isFinite(data.terrainSegments))throw new Error('Invalid Map Maker world file');checkpoint();restoreSnapshot(data);scheduleSave();$('#exportModal').classList.remove('show');notify('World imported')}
+function resetWorld(){if(!confirm('Start a new world? Export your current world first if you want a backup.'))return;checkpoint();objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];selected=null;nextId=1;$('#worldName').value='Untitled World';buildTerrain($('#presetSelect').value,Number($('#terrainDetail').value));camera.position.set(76,72,88);controls.target.set(0,2,0);controls.update();renderObjectList();updateInspector();updateStats();scheduleSave();notify('New world created')}
+$$('[data-tool]').forEach(b=>b.addEventListener('click',()=>{activeTool=b.dataset.tool;placeType=null;updateToolUI()}));
+$$('[data-place]').forEach(b=>b.addEventListener('click',()=>{placeType=placeType===b.dataset.place?null:b.dataset.place;if(placeType)activeTool='select';updateToolUI();notify(placeType?'Click terrain to place '+typeLabels[placeType].toLowerCase():'Placement cancelled')}));
+$$('[data-material]').forEach(b=>b.addEventListener('click',()=>{activeMaterial=b.dataset.material;updateToolUI();if(activeTool==='paint')notify('Paint selected: '+activeMaterial)}));
+$('#brushSize').addEventListener('input',e=>$('#brushSizeOut').textContent=Number(e.target.value).toFixed(1));
+$('#brushStrength').addEventListener('input',e=>$('#brushStrengthOut').textContent=Number(e.target.value).toFixed(2));
+$('#generateBtn').addEventListener('click',()=>{checkpoint();buildTerrain($('#presetSelect').value,terrainSegments);scheduleSave();notify('Terrain generated')});
+$('#terrainDetail').addEventListener('change',e=>{checkpoint();const heights=Array.from(heightData),colors=Array.from(groundColors);buildTerrain($('#presetSelect').value,Number(e.target.value));scheduleSave();notify('Terrain detail updated')});
+$('#worldTime').addEventListener('change',e=>setLighting(e.target.value));
+$('#worldName').addEventListener('change',()=>{updateStatus();scheduleSave()});
+$('#undoBtn').addEventListener('click',undo);$('#redoBtn').addEventListener('click',redo);
+$('#newBtn').addEventListener('click',resetWorld);$('#exportBtn').addEventListener('click',exportProject);$('#closeModal').addEventListener('click',()=>$('#exportModal').classList.remove('show'));
+$('#exportModal').addEventListener('click',e=>{if(e.target.id==='exportModal')e.currentTarget.classList.remove('show')});
+$('#downloadBtn').addEventListener('click',()=>{const blob=new Blob([$('#exportText').value],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=($('#worldName').value.trim()||'my-world').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.mapworld.json';a.click();URL.revokeObjectURL(a.href);notify('World file downloaded')});
+$('#importBtn').addEventListener('click',()=>$('#fileInput').click());
+$('#fileInput').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{importData(JSON.parse(await file.text()))}catch(err){notify('Import failed: invalid or unsupported world file')}e.target.value=''});
+$('#saveLocalBtn').addEventListener('click',()=>saveLocal());
+$('#resetCameraBtn').addEventListener('click',()=>{camera.position.set(76,72,88);controls.target.set(0,2,0);controls.update()});
+$('#clearObjectsBtn').addEventListener('click',()=>{if(!objectRecords.length)return;if(!confirm('Remove every placed object?'))return;checkpoint();objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];selected=null;renderObjectList();updateInspector();updateStats();scheduleSave()});
+$('#deleteBtn').addEventListener('click',deleteSelected);$('#duplicateBtn').addEventListener('click',duplicateSelected);
+$('#objectName').addEventListener('change',()=>{if(!selected)return;checkpoint();selected.name=$('#objectName').value.trim()||typeLabels[selected.type];renderObjectList();scheduleSave()});
+[['posX','x'],['posZ','z']].forEach(([id,axis])=>$('#'+id).addEventListener('input',e=>{if(!selected)return;selected.mesh.position[axis]=Number(e.target.value);if(axis==='x')$('#posXOut').textContent=Number(e.target.value).toFixed(1);else $('#posZOut').textContent=Number(e.target.value).toFixed(1);selected.mesh.position.y=heightAt(selected.mesh.position.x,selected.mesh.position.z);renderObjectList();updateStatus()}));
+$('#objScale').addEventListener('input',e=>{if(!selected)return;const v=Number(e.target.value);selected.mesh.scale.setScalar(v);$('#objScaleOut').textContent=v.toFixed(1)+'×';updateStatus()});
+$('#objRotate').addEventListener('input',e=>{if(!selected)return;selected.mesh.rotation.y=THREE.MathUtils.degToRad(Number(e.target.value));$('#objRotateOut').textContent=e.target.value+'°';updateStatus()});
+['posX','posZ','objScale','objRotate'].forEach(id=>$('#'+id).addEventListener('change',()=>{if(selected){scheduleSave();renderObjectList()}}));
+document.addEventListener('keydown',e=>{
+ const tag=document.activeElement?.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tag))return;
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}else if(e.key==='Delete'||e.key==='Backspace')deleteSelected();else if(e.key==='Escape'){placeType=null;updateToolUI()}
+});
+$$('.mobile-tabs button').forEach(b=>b.addEventListener('click',()=>{const panel=b.dataset.panel;$('#leftPanel').classList.remove('mobile-open');$('#rightPanel').classList.remove('mobile-open');$$('.mobile-tabs button').forEach(x=>x.classList.remove('active'));if(panel==='scene'){b.classList.add('active');return}$('#'+panel).classList.add('mobile-open');b.classList.add('active')}));
+init();updateToolUI();renderObjectList();updateInspector();updateStats();
+try{const saved=localStorage.getItem('mapmaker.project.v1');if(saved)restoreSnapshot(JSON.parse(saved))}catch(e){console.warn('Could not restore local project',e)}
+refreshHistoryButtons();
+</script>
+</body>
+</html>
