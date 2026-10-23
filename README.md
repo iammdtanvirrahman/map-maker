@@ -1,48 +1,62 @@
 # Map Maker — 3D World Studio
 
-A browser-based 3D world editor prototype. Create a small world, sculpt terrain, place objects, tweak selected objects, and save/export the scene.
+Map Maker is an early browser-based 3D world editor prototype. It is intended to grow into a creator-first platform for building, saving and sharing virtual worlds.
 
-## Try it
+## Try the editor
 
-Open `index.html` in a modern browser, or enable GitHub Pages for the repository:
-**Settings → Pages → Deploy from a branch → main / root**.
+- Live project: https://iammdtanvirrahman.github.io/map-maker/
+- Source: https://github.com/iammdtanvirrahman/map-maker
 
-The editor uses Three.js from jsDelivr, so an internet connection is required. No build step is required for the current prototype.
+The app is a static site using Three.js from jsDelivr. Open it in a modern browser with an internet connection.
 
-## Current MVP features
+## Current prototype features
 
-- Interactive 3D terrain viewport with orbit/zoom controls
+- 3D terrain viewport with orbit and zoom controls
 - Terrain sculpting: raise, lower, flatten and paint
-- Grass, sand, rock and snow surface colors
+- Grass, sand, rock and snow material colors
 - Place trees, rocks, houses, towers, water ponds and path markers
-- Scene hierarchy and object inspector
-- Move, scale, rotate, duplicate and delete placed objects
-- Preset terrain generation: island, valley, desert and snowy mountains
-- Daylight, sunset and blue-hour lighting presets
-- Undo/redo for scene changes
-- Local browser save/restore
-- Export and import world data as JSON
-- Responsive layout with mobile tool panels
+- Select and drag objects across the terrain
+- Object inspector for naming, position, scale and rotation
+- Duplicate and delete objects
+- Preset terrain: floating island, green valley, desert plateau and snowy mountains
+- Reproducible terrain seeds
+- Local text-based world recipes that choose terrain and scatter props using simple keyword rules
+- Brush preview, configurable brush size and strength
+- Scatter tree placement
+- Daylight, sunset and blue-hour lighting
+- Ground-grid toggle
+- Viewport screenshot export
+- Scene hierarchy, undo/redo, local browser save and restore
+- World JSON export/import with basic input validation
+- Mobile-responsive tool and inspector panels
+- GitHub Pages deployment workflow
 
-## Current limitations
+## Important prototype limitations
 
-This is an early prototype, not a production-ready game engine. It currently has no account system, cloud persistence, public publishing backend, multiplayer, AI world generation, advanced terrain texture splatting, collision/physics simulation, or asset marketplace. Local saves stay in the current browser/device. Treat imported world files as untrusted input.
+This is not yet a production-ready editor or full game engine. Projects are saved in the current browser or exported as JSON; there is no cloud account system, synced storage, public read-only world page, real-time collaboration, multiplayer, custom scripting runtime, asset marketplace or AI model integration. “World by description” currently uses local keyword rules and is **not generative AI**.
 
-## Product direction
+Imported projects should still be treated as untrusted data. Back up valuable projects before importing or changing terrain detail.
 
-1. Make terrain editing and asset placement reliable.
-2. Add robust world serialization, local project management and autosave.
-3. Run creator tests and collect usage/retention data.
-4. Add cloud accounts and publishable read-only world URLs.
-5. Consider AI-assisted world generation and shared collaboration after core usage is validated.
+## Technology
 
-## Technical choices
+- HTML/CSS and JavaScript ES modules
+- Three.js and OrbitControls
+- Import maps for browser module resolution
+- JSON project serialization and localStorage persistence
+- GitHub Pages deployment using GitHub Actions
 
-- HTML/CSS/JavaScript ES modules
-- Three.js for 3D rendering and OrbitControls
-- JSON-based world project export/import
-- localStorage for early prototype persistence
+## Product roadmap
 
-## Funding readiness
+1. Stabilize sculpting, drag placement, project save/restore, and undo/redo.
+2. Test the editor with independent creators; fix usability and performance problems.
+3. Add improved terrain materials, brushes, roads/rivers, and asset organization.
+4. Add backend accounts, cloud projects and publishable read-only world links.
+5. Explore true AI-assisted world generation only after the core editor is validated.
 
-Before fundraising, prepare a short demo, user feedback from target creators, a comparison with alternatives, an MVP milestone budget, and a clear explanation of how this product differs from existing world editors.
+## Investor readiness checklist
+
+- Record a real product demo from the deployed site.
+- Interview target creators and document their feedback.
+- Measure first-world completion and repeat usage, not just sign-ups.
+- Compare the workflow with existing world editors and prove a specific differentiation.
+- Build a milestone-based budget before requesting investment.
