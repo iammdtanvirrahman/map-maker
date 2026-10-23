@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0b0f14" />
 <meta name="description" content="Map Maker — create, sculpt, and share interactive 3D worlds." />
 <title>Map Maker — Build a World</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,6 +28,7 @@
       <button id="undoBtn" title="Undo (Ctrl+Z)" disabled>↶</button>
       <button id="redoBtn" title="Redo (Ctrl+Y)" disabled>↷</button>
       <button id="newBtn">New</button>
+      <button id="shotBtn" title="Save viewport screenshot">Shot ▧</button>
       <button id="exportBtn" class="primary">Export ↗</button>
     </div>
   </header>
@@ -76,7 +78,10 @@
           <option value="desert">Desert plateau</option>
           <option value="mountains">Snowy mountains</option>
         </select>
+        <label class="field-label" for="terrainSeed">Generation seed</label><input id="terrainSeed" type="number" min="1" max="999999" value="47">
         <button class="full" id="generateBtn" style="margin-top:8px">✦ Generate terrain</button>
+        <button class="full" id="scatterBtn" style="margin-top:7px">♧ Scatter 24 trees</button>
+        <p class="small-note">Same seed + same preset = reproducible terrain.</p>
       </section>
     </aside>
     <section class="center">
@@ -115,7 +120,8 @@
         <select id="worldTime"><option value="day">Clear daylight</option><option value="sunset">Warm sunset</option><option value="night">Blue hour</option></select>
         <label class="field-label" for="terrainDetail">Terrain detail</label>
         <select id="terrainDetail"><option value="48">Performance · 48 segments</option><option value="80" selected>Balanced · 80 segments</option><option value="120">High · 120 segments</option></select>
-        <button class="full" id="resetCameraBtn" style="margin-top:9px">↗ Reset camera</button>
+        <button class="full" id="toggleGridBtn" style="margin-top:9px">▦ Toggle ground grid</button>
+        <button class="full" id="resetCameraBtn" style="margin-top:7px">↗ Reset camera</button>
         <button class="full" id="saveLocalBtn" style="margin-top:7px">Save in this browser</button>
         <p class="small-note">Prototype note: projects are saved in this browser or exported as a JSON file. Cloud accounts and public publishing are planned for a later release.</p>
       </section>
@@ -138,14 +144,14 @@
 </div>
 <input id="fileInput" type="file" accept=".json,application/json" hidden>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const viewport = $('#viewport');
 let scene, camera, renderer, controls, terrain, terrainMaterial, raycaster, pointer;
-let heightData, groundColors, terrainSegments = 80, terrainSize = 128;
+let heightData, groundColors, terrainSegments = 80, terrainSize = 128, worldSeed = 47, groundGrid, gridVisible = true;
 let activeTool = 'raise', activeMaterial = 'grass', placeType = null;
 let selected = null, objectRecords = [], nextId = 1;
 let undoStack = [], redoStack = [], strokeBefore = null, isSculpting = false;
@@ -156,7 +162,7 @@ const typeIcons = {tree:'🌲',rock:'🪨',house:'⌂',tower:'♜',water:'≈',p
 const toolLabels = {raise:'RAISE TERRAIN',lower:'LOWER TERRAIN',flatten:'FLATTEN TERRAIN',paint:'PAINT SURFACE',select:'SELECT OBJECT'};
 function notify(message){const n=$('#notice');n.textContent=message;n.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>n.classList.remove('show'),2300)}
 function updateStatus(s='UNSAVED CHANGES'){$('#saveStatus').textContent=s}
-function randomNoise(x,z){return (Math.sin(x*1.7+z*.37)*Math.cos(z*1.21-x*.49)+Math.sin(x*.41-z*.82)*.5+Math.cos((x+z)*.67)*.25)}
+function randomNoise(x,z){const p=worldSeed*.0137;return (Math.sin(x*1.7+z*.37+p)*Math.cos(z*1.21-x*.49-p*.7)+Math.sin(x*.41-z*.82+p*1.3)*.5+Math.cos((x+z)*.67-p*.4)*.25)}
 function baseHeight(x,z,preset='island'){
   const n=randomNoise(x*.16,z*.16)*1.8+randomNoise(x*.42,z*.42)*.75;
   const r=Math.sqrt(x*x+z*z), island=Math.max(0,1-r/64);
@@ -206,12 +212,12 @@ function makeObject(type){
  const builders={tree:makeTree,rock:makeRock,house:makeHouse,tower:makeTower,water:makeWater,path:makePath};return (builders[type]||makeRock)();
 }
 function snapshot(){
- return {name:$('#worldName').value,terrainSegments,heights:Array.from(heightData),colors:Array.from(groundColors),objects:objectRecords.map(o=>({id:o.id,type:o.type,name:o.name,position:o.mesh.position.toArray(),rotation:o.mesh.rotation.toArray(),scale:o.mesh.scale.toArray()})),camera:{position:camera.position.toArray(),target:controls.target.toArray()}};
+ return {name:$('#worldName').value,terrainSegments,worldSeed,terrainPreset:$('#presetSelect').value,lighting:$('#worldTime').value,heights:Array.from(heightData),colors:Array.from(groundColors),objects:objectRecords.map(o=>({id:o.id,type:o.type,name:o.name,position:o.mesh.position.toArray(),rotation:o.mesh.rotation.toArray(),scale:o.mesh.scale.toArray()})),camera:{position:camera.position.toArray(),target:controls.target.toArray()}};
 }
 function restoreSnapshot(data){
  $('#worldName').value=data.name||'Untitled World';
- terrainSegments=data.terrainSegments||80;
- buildTerrain('island',terrainSegments,true);
+ terrainSegments=Number(data.terrainSegments)||80;worldSeed=Number(data.worldSeed)||47;$('#terrainSeed').value=worldSeed;$('#presetSelect').value=data.terrainPreset||'island';$('#worldTime').value=data.lighting||'day';
+ buildTerrain($('#presetSelect').value,terrainSegments,true);
  const pos=terrain.geometry.attributes.position;
  if(Array.isArray(data.heights)&&data.heights.length===pos.count){heightData=Float32Array.from(data.heights);for(let i=0;i<pos.count;i++)pos.setY(i,heightData[i]);}
  if(Array.isArray(data.colors)&&data.colors.length===pos.count*3){groundColors=Float32Array.from(data.colors);terrain.geometry.setAttribute('color',new THREE.BufferAttribute(groundColors,3))}
@@ -219,12 +225,12 @@ function restoreSnapshot(data){
  objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];
  for(const entry of (data.objects||[])){const mesh=makeObject(entry.type);mesh.position.fromArray(entry.position||[0,0,0]);mesh.rotation.fromArray(entry.rotation||[0,0,0]);mesh.scale.fromArray(entry.scale||[1,1,1]);scene.add(mesh);objectRecords.push({...entry,mesh});nextId=Math.max(nextId,(entry.id||0)+1)}
  if(data.camera){camera.position.fromArray(data.camera.position);controls.target.fromArray(data.camera.target);controls.update()}
- selected=null;renderObjectList();updateInspector();updateStats();updateStatus('PROJECT LOADED');
+ selected=null;renderObjectList();updateInspector();updateStats();setLighting($('#worldTime').value);updateStatus('PROJECT LOADED');
 }
 function checkpoint(){undoStack.push(JSON.stringify(snapshot()));if(undoStack.length>35)undoStack.shift();redoStack=[];refreshHistoryButtons()}
 function refreshHistoryButtons(){$('#undoBtn').disabled=!undoStack.length;$('#redoBtn').disabled=!redoStack.length}
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(snapshot()));restoreSnapshot(JSON.parse(undoStack.pop()));refreshHistoryButtons();notify('Undo complete')}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(snapshot()));restoreSnapshot(JSON.parse(redoStack.pop()));refreshHistoryButtons();notify('Redo complete')}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(snapshot()));restoreSnapshot(JSON.parse(undoStack.pop()));refreshHistoryButtons();scheduleSave();notify('Undo complete')}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(snapshot()));restoreSnapshot(JSON.parse(redoStack.pop()));refreshHistoryButtons();scheduleSave();notify('Redo complete')}
 function addObject(type,x=0,z=0,record=true){
  if(record)checkpoint();const mesh=makeObject(type);mesh.position.set(x,heightAt(x,z),z);mesh.rotation.y=Math.random()*.25;scene.add(mesh);
  const obj={id:nextId++,type,name:(typeLabels[type]||'Object')+' '+(objectRecords.filter(o=>o.type===type).length+1),mesh};objectRecords.push(obj);selectObject(obj);renderObjectList();updateStats();updateStatus();return obj;
@@ -258,7 +264,7 @@ function updateGroundColors(){
 }
 function sculptAt(point){
  const geo=terrain.geometry,pos=geo.attributes.position;const radius=Number($('#brushSize').value),strength=Number($('#brushStrength').value)*.095;
- if(!strokeBefore)strokeBefore=Array.from(heightData);
+ if(!strokeBefore)strokeBefore=JSON.stringify(snapshot());
  for(let i=0;i<pos.count;i++){
    const dx=pos.getX(i)-point.x,dz=pos.getZ(i)-point.z,d=Math.hypot(dx,dz);if(d>radius)continue;
    const falloff=(1+Math.cos(Math.PI*d/radius))/2;
@@ -269,8 +275,9 @@ function sculptAt(point){
  }
  pos.needsUpdate=true;geo.computeVertexNormals();updateStatus();
 }
-function commitStroke(){if(strokeBefore){undoStack.push(JSON.stringify({...snapshot(),heights:strokeBefore}));if(undoStack.length>35)undoStack.shift();redoStack=[];strokeBefore=null;refreshHistoryButtons();scheduleSave()}}
+function commitStroke(){if(strokeBefore){undoStack.push(strokeBefore);if(undoStack.length>35)undoStack.shift();redoStack=[];strokeBefore=null;refreshHistoryButtons();scheduleSave()}}
 function paintAt(point){
+ if(!strokeBefore)strokeBefore=JSON.stringify(snapshot());
  const pos=terrain.geometry.attributes.position,col=terrain.geometry.attributes.color,radius=Number($('#brushSize').value)*1.5;
  for(let i=0;i<pos.count;i++){const d=Math.hypot(pos.getX(i)-point.x,pos.getZ(i)-point.z);if(d>radius)continue;const f=(1+Math.cos(Math.PI*d/radius))/2,base=matColors[activeMaterial];const current=new THREE.Color(col.getX(i),col.getY(i),col.getZ(i));current.lerp(base,.6*f);col.setXYZ(i,current.r,current.g,current.b);groundColors.set([current.r,current.g,current.b],i*3)}
  col.needsUpdate=true;updateStatus();
@@ -289,7 +296,7 @@ function init(){
  controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.06;controls.maxPolarAngle=Math.PI*.485;controls.minDistance=15;controls.maxDistance=220;controls.target.set(0,2,0);
  scene.add(new THREE.HemisphereLight('#e2f4ff','#4b5840',2.0));
  const sun=new THREE.DirectionalLight('#fff0d2',3.2);sun.position.set(-45,80,35);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;scene.add(sun);scene.add(sun.target);
- const grid=new THREE.GridHelper(terrainSize,32,'#6f8c83','#71877f');grid.position.y=-1.8;grid.material.transparent=true;grid.material.opacity=.2;scene.add(grid);
+ groundGrid=new THREE.GridHelper(terrainSize,32,'#6f8c83','#71877f');groundGrid.position.y=-1.8;groundGrid.material.transparent=true;groundGrid.material.opacity=.2;scene.add(groundGrid);
  raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();
  buildTerrain('island');
  const resize=()=>{const w=Math.max(1,viewport.clientWidth),h=Math.max(1,viewport.clientHeight);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)};new ResizeObserver(resize).observe(viewport);resize();
@@ -302,7 +309,7 @@ function onPointerDown(e){
   const p=result.point;$('#coordLabel').textContent='X '+p.x.toFixed(1)+' / Z '+p.z.toFixed(1);
   if(placeType){addObject(placeType,p.x,p.z);placeType=null;updateToolUI();scheduleSave();return}
   if(activeTool==='select'){selected=null;renderObjectList();updateInspector();return}
-  checkpoint();isSculpting=true;controls.enabled=false;
+  strokeBefore=null;isSculpting=true;controls.enabled=false;
   if(activeTool==='paint')paintAt(p);else sculptAt(p);
  }else if(result.record&&activeTool==='select'){selectObject(result.record)}
  else if(result.record&&placeType){addObject(placeType,result.point.x,result.point.z)}
@@ -333,8 +340,10 @@ $$('[data-place]').forEach(b=>b.addEventListener('click',()=>{placeType=placeTyp
 $$('[data-material]').forEach(b=>b.addEventListener('click',()=>{activeMaterial=b.dataset.material;updateToolUI();if(activeTool==='paint')notify('Paint selected: '+activeMaterial)}));
 $('#brushSize').addEventListener('input',e=>$('#brushSizeOut').textContent=Number(e.target.value).toFixed(1));
 $('#brushStrength').addEventListener('input',e=>$('#brushStrengthOut').textContent=Number(e.target.value).toFixed(2));
-$('#generateBtn').addEventListener('click',()=>{checkpoint();buildTerrain($('#presetSelect').value,terrainSegments);scheduleSave();notify('Terrain generated')});
-$('#terrainDetail').addEventListener('change',e=>{checkpoint();const heights=Array.from(heightData),colors=Array.from(groundColors);buildTerrain($('#presetSelect').value,Number(e.target.value));scheduleSave();notify('Terrain detail updated')});
+$('#generateBtn').addEventListener('click',()=>{checkpoint();worldSeed=Math.max(1,Math.min(999999,Number($('#terrainSeed').value)||47));$('#terrainSeed').value=worldSeed;buildTerrain($('#presetSelect').value,terrainSegments);scheduleSave();notify('Terrain generated · seed '+worldSeed)});
+$('#terrainSeed').addEventListener('change',()=>{worldSeed=Math.max(1,Math.min(999999,Number($('#terrainSeed').value)||47));$('#terrainSeed').value=worldSeed});
+$('#scatterBtn').addEventListener('click',()=>{checkpoint();let count=0;for(let i=0;i<24;i++){const x=(Math.random()-.5)*86,z=(Math.random()-.5)*86;if(Math.hypot(x,z)>59)continue;const mesh=makeObject('tree');mesh.position.set(x,heightAt(x,z),z);mesh.rotation.y=Math.random()*Math.PI*2;const o={id:nextId++,type:'tree',name:'Tree '+(objectRecords.filter(o=>o.type==='tree').length+1),mesh};scene.add(mesh);objectRecords.push(o);count++}selected=null;renderObjectList();updateInspector();updateStats();scheduleSave();notify('Scattered '+count+' trees')});
+$('#terrainDetail').addEventListener('change',e=>{checkpoint();worldSeed=Math.max(1,Number($('#terrainSeed').value)||47);buildTerrain($('#presetSelect').value,Number(e.target.value));scheduleSave();notify('Terrain detail updated')});
 $('#worldTime').addEventListener('change',e=>setLighting(e.target.value));
 $('#worldName').addEventListener('change',()=>{updateStatus();scheduleSave()});
 $('#undoBtn').addEventListener('click',undo);$('#redoBtn').addEventListener('click',redo);
@@ -344,14 +353,17 @@ $('#downloadBtn').addEventListener('click',()=>{const blob=new Blob([$('#exportT
 $('#importBtn').addEventListener('click',()=>$('#fileInput').click());
 $('#fileInput').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{importData(JSON.parse(await file.text()))}catch(err){notify('Import failed: invalid or unsupported world file')}e.target.value=''});
 $('#saveLocalBtn').addEventListener('click',()=>saveLocal());
+$('#toggleGridBtn').addEventListener('click',()=>{gridVisible=!gridVisible;groundGrid.visible=gridVisible;$('#toggleGridBtn').classList.toggle('active',gridVisible);notify(gridVisible?'Ground grid visible':'Ground grid hidden')});
+$('#shotBtn').addEventListener('click',()=>{try{renderer.render(scene,camera);renderer.domElement.toBlob(blob=>{if(!blob){notify('Screenshot failed');return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='map-maker-'+Date.now()+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);notify('Viewport screenshot saved')},'image/png')}catch(e){notify('Screenshot unavailable in this browser')}});
 $('#resetCameraBtn').addEventListener('click',()=>{camera.position.set(76,72,88);controls.target.set(0,2,0);controls.update()});
 $('#clearObjectsBtn').addEventListener('click',()=>{if(!objectRecords.length)return;if(!confirm('Remove every placed object?'))return;checkpoint();objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];selected=null;renderObjectList();updateInspector();updateStats();scheduleSave()});
 $('#deleteBtn').addEventListener('click',deleteSelected);$('#duplicateBtn').addEventListener('click',duplicateSelected);
-$('#objectName').addEventListener('change',()=>{if(!selected)return;checkpoint();selected.name=$('#objectName').value.trim()||typeLabels[selected.type];renderObjectList();scheduleSave()});
+$('#objectName').addEventListener('focus',()=>{if(selected)checkpoint()});
+$('#objectName').addEventListener('change',()=>{if(!selected)return;selected.name=$('#objectName').value.trim()||typeLabels[selected.type];renderObjectList();scheduleSave()});
 [['posX','x'],['posZ','z']].forEach(([id,axis])=>$('#'+id).addEventListener('input',e=>{if(!selected)return;selected.mesh.position[axis]=Number(e.target.value);if(axis==='x')$('#posXOut').textContent=Number(e.target.value).toFixed(1);else $('#posZOut').textContent=Number(e.target.value).toFixed(1);selected.mesh.position.y=heightAt(selected.mesh.position.x,selected.mesh.position.z);renderObjectList();updateStatus()}));
 $('#objScale').addEventListener('input',e=>{if(!selected)return;const v=Number(e.target.value);selected.mesh.scale.setScalar(v);$('#objScaleOut').textContent=v.toFixed(1)+'×';updateStatus()});
 $('#objRotate').addEventListener('input',e=>{if(!selected)return;selected.mesh.rotation.y=THREE.MathUtils.degToRad(Number(e.target.value));$('#objRotateOut').textContent=e.target.value+'°';updateStatus()});
-['posX','posZ','objScale','objRotate'].forEach(id=>$('#'+id).addEventListener('change',()=>{if(selected){scheduleSave();renderObjectList()}}));
+['posX','posZ','objScale','objRotate'].forEach(id=>{const el=$('#'+id);el.addEventListener('pointerdown',()=>{if(selected)checkpoint()});el.addEventListener('keydown',e=>{if(selected&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))checkpoint()});el.addEventListener('change',()=>{if(selected){scheduleSave();renderObjectList();updateInspector()}})});
 document.addEventListener('keydown',e=>{
  const tag=document.activeElement?.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tag))return;
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}else if(e.key==='Delete'||e.key==='Backspace')deleteSelected();else if(e.key==='Escape'){placeType=null;updateToolUI()}
