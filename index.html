@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b0f14" />
-<meta name="description" content="Map Maker — create, sculpt, and share interactive 3D worlds." />
-<title>Map Maker — Build a World</title>
+<meta name="description" content="Map Maker — a notebook-inspired sketchbook for creating interactive 3D worlds." />
+<title>Map Maker — World Sketchbook</title>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +16,62 @@
 @media(max-width:1050px){.workspace{grid-template-columns:210px minmax(0,1fr) 225px}.brand{min-width:auto}.brand-sub{display:none}.project-name input{width:115px}.status{display:none}}
 @media(max-width:760px){.app{grid-template-rows:54px 1fr}.topbar{padding:0 10px}.brand{gap:7px}.brand-icon{width:29px;height:29px}.brand-name{font-size:13px}.project-name{display:none}.top-actions{gap:5px}.top-actions button{padding:8px;font-size:11px}.workspace{display:block;position:relative}.center{position:absolute;inset:0 0 54px}.sidebar{display:none}.sidebar.mobile-open{display:block;position:absolute;z-index:3;top:0;bottom:54px;width:min(310px,88vw);overflow:auto;box-shadow:0 12px 40px #0008}.left.mobile-open{left:0}.right.mobile-open{right:0}.mobile-tabs{position:absolute;bottom:0;height:54px;left:0;right:0;border-top:1px solid var(--line);background:#0d1117;display:grid;grid-template-columns:repeat(3,1fr);z-index:4}.mobile-tabs button{border:0;border-radius:0;background:transparent;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-size:10px;color:var(--muted)}.mobile-tabs button span{font-size:17px}.mobile-tabs button.active{color:var(--lime);background:#1b2417}.view-top{top:9px;left:9px;right:9px}.view-bottom{bottom:9px;left:9px;right:9px}.chip{padding:7px 9px;font-size:10px}.mini-stats .stat:nth-child(2){display:none}.stat{padding:7px 8px}.notice{bottom:65px;max-width:90vw;overflow:hidden;text-overflow:ellipsis}.brand-sub{display:none}}
 @media(max-width:390px){.top-actions button{padding:7px 8px}.brand-name{max-width:72px;overflow:hidden}.view-top .chip:last-child{display:none}}
+
+/* Notebook paper mode: warm page, blue ruling, red margin and ink-like controls. */
+:root{color-scheme:light;--bg:#eee9dc;--panel:#fbf8ef;--panel2:#f3efe4;--line:#d7d0bf;--muted:#77776f;--text:#2c332f;--lime:#456d52;--blue:#678eac;--danger:#b84f4f}
+html,body{background:#eee9dc;color:var(--text)}
+.topbar{background:#fbf8ef;border-bottom-color:#d8d0bf;box-shadow:0 2px 8px #5f4e2710}
+.brand-icon{background:#456d52;color:#fff}
+.brand-sub{color:#7f8578}
+.project-name{color:#353d36}
+.project-name input{color:#353d36}
+.sidebar{background:#f8f5eb}
+.left{border-right-color:#d7d0bf}.right{border-left-color:#d7d0bf}
+.side-head,.section{border-color:#ded7c6}
+.side-head{color:#687169}
+.section-title{color:#5f6a61}
+.hint,.tool small,.small-note{color:#7c8177}
+button{background:#fdfaf2;color:#37423a;border-color:#d4ccba;box-shadow:0 1px 0 #fff9}
+button:hover{background:#f0ecdf;border-color:#b8b09d}
+button.primary{background:#456d52;color:#fff;border-color:#456d52}
+button.primary:hover{background:#365b42}
+button.active{background:#e6eddf;color:#365d41;border-color:#6f9677}
+.tool{background:#f4f0e5}
+.swatch{background:#f8f5eb;border-color:#d8d0bf}
+.swatch.active{background:#e6eddf;border-color:#789a7c}
+.tool .ico{filter:saturate(.82)}
+.center{background-color:#faf5e7;isolation:isolate}
+.center::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 30px,rgba(92,145,190,.17) 31px,rgba(92,145,190,.17) 32px),linear-gradient(to right,transparent 0 69px,rgba(197,86,83,.43) 70px,rgba(197,86,83,.43) 72px,transparent 73px),radial-gradient(rgba(111,93,59,.055) .55px,transparent .8px);background-size:auto,auto,4px 4px}
+.viewport{z-index:1}
+.view-top,.view-bottom{z-index:2}
+.chip{background:rgba(255,252,244,.91);border-color:#d3c9b2;color:#475349;box-shadow:0 3px 12px #5e512012}
+.chip strong{color:#2d3931}
+.stat{background:rgba(255,252,244,.94);border-color:#d4cbb7;color:#73786e}
+.stat b{color:#354137}
+.object-row{color:#515b51}
+.object-row:hover{background:#eeeadd}
+.object-row.selected{background:#e7edde;border-color:#92ad8d;color:#31583b}
+.object-row .obj-pos{color:#7a8076}
+.empty{border-color:#d6cdbb;color:#777c72;background:#fcf9f1}
+input[type=text],input[type=number],select{background:#fffdf7;color:#303a32;border-color:#d3cbb9}
+input[type=range]{accent-color:#456d52}
+.field-label,.range-row{color:#657065}
+.range-row output{color:#456d52}
+.modal-backdrop{background:rgba(56,49,34,.44)}
+.modal{background:#fbf8ef;border-color:#d0c6b1;box-shadow:0 28px 90px #3d35244d;color:#2c332f}
+.modal textarea,.promptbox{background:#fffdf7;color:#313a33;border-color:#d2c8b5}
+.modal .hint{color:#72776f}
+.notice{background:#fffdf5;border-color:#d0c6b2;color:#354338;box-shadow:0 12px 34px #53462a25}
+.mobile-tabs{background:#fbf8ef;border-top-color:#d7d0bf}
+.mobile-tabs button{background:transparent;color:#72796f}
+.mobile-tabs button.active{color:#355c40;background:#e7eddf}
+@media(max-width:760px){.sidebar.mobile-open{background:#f8f5eb;box-shadow:0 12px 40px #4f452b30}}
 </style>
 </head>
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="brand-icon">M</div><div><div class="brand-name">MAP MAKER</div><div class="brand-sub">WORLD STUDIO / 001</div></div></div>
+    <div class="brand"><div class="brand-icon">M</div><div><div class="brand-name">MAP MAKER</div><div class="brand-sub">SKETCHBOOK / 001</div></div></div>
     <label class="project-name" title="Rename your world">◈ <input id="worldName" value="Untitled World" aria-label="World name" maxlength="64"></label>
     <div class="top-actions">
       <div class="status"><span class="dot"></span><span id="saveStatus">LOCAL PROJECT</span></div>
@@ -94,7 +144,7 @@
     <section class="center">
       <div class="viewport" id="viewport"></div>
       <div class="view-top">
-        <div class="chip"><span class="dot"></span><strong id="toolLabel">RAISE TERRAIN</strong><span style="color:var(--muted)">· EDIT MODE</span></div>
+        <div class="chip"><span class="dot"></span><strong id="toolLabel">RAISE TERRAIN</strong><span style="color:var(--muted)">· ON PAPER</span></div>
         <div class="chip">⌖ <strong id="coordLabel">X 0.0 / Z 0.0</strong></div>
       </div>
       <div class="view-bottom">
@@ -297,9 +347,9 @@ function getHit(e){
  const record=objectRecords.find(o=>o.mesh===object);return {hit,object,record,point:hit.point};
 }
 function init(){
- scene=new THREE.Scene();scene.background=new THREE.Color('#a8c8d5');scene.fog=new THREE.Fog('#a8c8d5',115,255);
+ scene=new THREE.Scene();scene.background=null;scene.fog=new THREE.Fog('#faf5e7',135,280);
  camera=new THREE.PerspectiveCamera(48,1,.1,600);camera.position.set(76,72,88);
- renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance',preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;viewport.appendChild(renderer.domElement);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:true});renderer.setClearColor('#faf5e7',0);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;viewport.appendChild(renderer.domElement);
  controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.06;controls.maxPolarAngle=Math.PI*.485;controls.minDistance=15;controls.maxDistance=220;controls.target.set(0,2,0);
  scene.add(new THREE.HemisphereLight('#e2f4ff','#4b5840',2.0));
  const sun=new THREE.DirectionalLight('#fff0d2',3.2);sun.position.set(-45,80,35);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;scene.add(sun);scene.add(sun.target);
@@ -331,8 +381,8 @@ function onPointerMove(e){
 }
 function onPointerUp(){pointerDown=false;if(isDraggingObject){isDraggingObject=false;controls.enabled=true;dragObject=null;if(didDragObject){scheduleSave();notify('Object moved')}else if(undoStack.length){undoStack.pop();refreshHistoryButtons()} }if(isSculpting){commitStroke();isSculpting=false;controls.enabled=true;scheduleSave()} }
 function setLighting(mode){
- const configs={day:{bg:'#a8c8d5',fog:'#a8c8d5',exposure:1.15},sunset:{bg:'#d99b7b',fog:'#d99b7b',exposure:1.2},night:{bg:'#17243d',fog:'#17243d',exposure:.72}};
- const c=configs[mode]||configs.day;scene.background.set(c.bg);scene.fog.color.set(c.fog);renderer.toneMappingExposure=c.exposure;
+ const configs={day:{bg:'#faf5e7',fog:'#faf5e7',exposure:1.15},sunset:{bg:'#faf5e7',fog:'#f5eadb',exposure:1.12},night:{bg:'#f7f1e6',fog:'#f7f1e6',exposure:.8}};
+ const c=configs[mode]||configs.day;if(scene.background)scene.background.set(c.bg);if(scene.fog)scene.fog.color.set(c.fog);renderer.toneMappingExposure=c.exposure;
  scene.children.filter(o=>o.isHemisphereLight).forEach(l=>{l.intensity=mode==='night'?.65:2;l.color.set(mode==='sunset'?'#ffd5b0':mode==='night'?'#7d9bd3':'#e2f4ff')});
  scene.children.filter(o=>o.isDirectionalLight).forEach(l=>{l.intensity=mode==='night'?.55:3.2;l.color.set(mode==='sunset'?'#ffb37b':mode==='night'?'#91b4ff':'#fff0d2')});
 }
@@ -365,7 +415,7 @@ $('#importBtn').addEventListener('click',()=>$('#fileInput').click());
 $('#fileInput').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{importData(JSON.parse(await file.text()))}catch(err){notify('Import failed: invalid or unsupported world file')}e.target.value=''});
 $('#saveLocalBtn').addEventListener('click',()=>saveLocal());
 $('#toggleGridBtn').addEventListener('click',()=>{gridVisible=!gridVisible;groundGrid.visible=gridVisible;$('#toggleGridBtn').classList.toggle('active',gridVisible);notify(gridVisible?'Ground grid visible':'Ground grid hidden')});
-$('#shotBtn').addEventListener('click',()=>{try{renderer.render(scene,camera);renderer.domElement.toBlob(blob=>{if(!blob){notify('Screenshot failed');return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='map-maker-'+Date.now()+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);notify('Viewport screenshot saved')},'image/png')}catch(e){notify('Screenshot unavailable in this browser')}});
+$('#shotBtn').addEventListener('click',()=>{try{renderer.render(scene,camera);const src=renderer.domElement,out=document.createElement('canvas');out.width=src.width;out.height=src.height;const ctx=out.getContext('2d');if(!ctx)throw new Error('Canvas unavailable');ctx.fillStyle='#faf5e7';ctx.fillRect(0,0,out.width,out.height);const scale=src.width/Math.max(1,viewport.clientWidth);ctx.strokeStyle='rgba(92,145,190,.2)';ctx.lineWidth=Math.max(1,scale);for(let y=0;y<out.height;y+=32*scale){ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(out.width,y+.5);ctx.stroke()}ctx.strokeStyle='rgba(197,86,83,.52)';ctx.beginPath();ctx.moveTo(71*scale,0);ctx.lineTo(71*scale,out.height);ctx.stroke();ctx.drawImage(src,0,0);out.toBlob(blob=>{if(!blob){notify('Screenshot failed');return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='map-maker-'+Date.now()+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);notify('Notebook-style viewport exported')},'image/png')}catch(e){notify('Screenshot unavailable in this browser')}});
 $('#resetCameraBtn').addEventListener('click',()=>{camera.position.set(76,72,88);controls.target.set(0,2,0);controls.update()});
 $('#clearObjectsBtn').addEventListener('click',()=>{if(!objectRecords.length)return;if(!confirm('Remove every placed object?'))return;checkpoint();objectRecords.forEach(o=>scene.remove(o.mesh));objectRecords=[];selected=null;renderObjectList();updateInspector();updateStats();scheduleSave()});
 $('#deleteBtn').addEventListener('click',deleteSelected);$('#duplicateBtn').addEventListener('click',duplicateSelected);
